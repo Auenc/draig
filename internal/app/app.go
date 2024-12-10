@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/auenc/draig/internal/components"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -18,13 +19,13 @@ const (
 	response
 )
 
-var style = lipgloss.NewStyle().PaddingLeft(2).PaddingRight(2).PaddingTop(1)
+var style = lipgloss.NewStyle() //.PaddingLeft(2).PaddingRight(2).PaddingTop(1)
 
 type model struct {
-	topbar      topbar
-	requestbar  requestbar
-	responsebar responsebar
-	cmdbar      cmdbar
+	topbar      components.Container
+	requestbar  components.Container
+	responsebar components.Container
+	cmdbar      components.Container
 }
 
 func (m model) Init() tea.Cmd {
@@ -35,6 +36,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.topbar.Update(msg)
+		m.requestbar.Update(msg)
+		m.responsebar.Update(msg)
+		m.cmdbar.Update(msg)
 		break
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -59,7 +63,16 @@ func (m model) View() string {
 }
 
 func initialModel() model {
-	m := model{topbar: newTopbar(2)}
+	m := model{
+		topbar: components.NewContainer(1, []tea.Model{
+			components.Button{Text: "GET"},
+			components.Button{Text: "test 1"},
+			components.Button{Text: "test 2"},
+		}),
+		requestbar:  components.NewContainer(4, nil),
+		responsebar: components.NewContainer(6.5, nil),
+		cmdbar:      components.NewContainer(0.5, nil),
+	}
 
 	return m
 }
